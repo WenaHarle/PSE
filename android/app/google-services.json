@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "51381034534",
+    "project_id": "agrishade-428de",
+    "storage_bucket": "agrishade-428de.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:51381034534:android:7bf35078555903aa0410e7",
+        "android_client_info": {
+          "package_name": "com.example.agrishade"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMavdlLaJCnAImDKQ6abMQrqatFIud1_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
