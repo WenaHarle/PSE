@@ -24,7 +24,6 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> {
-  final FirebaseAuthService _auth = FirebaseAuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -42,26 +41,24 @@ class _SignUpFormState extends State<SignUpForm> {
       String email = emailController.text;
       String password = passwordController.text;
 
-      User? user = await _auth.signUpWithEmailAndPassword(email, password);
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (user != null) {
-        await _firestore.collection('users').doc(user.uid).set({
+      try {
+        // Create a new document in the Firestore 'users' collection
+        await _firestore.collection('users').add({
           'username': username,
           'email': email,
           'password': password,
         });
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
-
-        globalUsername = username;
-      } else {
         setState(() {
+          _isLoading = false;
+        });
+
+        // Show a success message or navigate back to the login page
+        Navigator.pop(context);  // This will pop the current SignUpPage and navigate to LoginPage
+
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
           _errorMessage = 'Sign up failed. Please try again.';
         });
       }
@@ -244,3 +241,4 @@ class _SignUpFormState extends State<SignUpForm> {
     );
   }
 }
+

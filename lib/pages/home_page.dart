@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date formatting
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firebase Firestore
+import 'package:firebase_core/firebase_core.dart'; // Firebase Core
 import '../globals.dart'; // Import the global variable
 
 class HomePage extends StatefulWidget {
@@ -13,13 +15,31 @@ class _HomePageState extends State<HomePage> {
   String _accountName = 'Anonymous User'; // Default username
   String _greeting = '';
   String _currentDateTime = ''; // Holds dynamic time string
+  late FirebaseFirestore _firestore;
+  Map<String, dynamic> _firebaseData = {}; // Store data fetched from Firestore
 
   @override
   void initState() {
     super.initState();
+    _initializeFirebase(); // Initialize Firebase
     _loadGlobalUsername(); // Load username from global variable
     _updateGreeting();
     _updateDateTime();
+  }
+
+  // Initialize Firebase
+  void _initializeFirebase() async {
+    await Firebase.initializeApp();
+    _firestore = FirebaseFirestore.instance; // Initialize Firestore
+
+    // Listen to the Firestore document for changes
+    _firestore.collection('data').doc('bJExEVntCHi9awEXmakn').snapshots().listen((snapshot) {
+      if (snapshot.exists) {
+        setState(() {
+          _firebaseData = snapshot.data()!; // Update the Firestore data
+        });
+      }
+    });
   }
 
   // Load the username from the global variable
@@ -59,7 +79,7 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Colors.grey[300],
+              backgroundColor: Colors.green[300], // Green accent for avatar
               child: const Icon(Icons.person, color: Colors.white),
             ),
             const SizedBox(width: 10),
@@ -89,7 +109,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Padding(
+      body: Container(
+        color: Colors.white, // White background
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -104,21 +125,42 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 20),
-            // Toggle Section
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _currentDateTime, // Dynamic time string
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    const Text("Tertutup"),
-                    Switch(value: false, onChanged: (val) {}),
-                  ],
-                ),
-              ],
+            // Full Width Card with Date and Switch
+            Container(
+              decoration: BoxDecoration(
+                color: Color(0xFF4CAF50), // Green color for the card
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _currentDateTime, // Dynamic time string
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Tertutup",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Switch(
+                        value: _firebaseData['switch'] ?? false,
+                        onChanged: (val) async {
+                          await _firestore.collection('data').doc('bJExEVntCHi9awEXmakn').update({
+                            'switch': val,
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             // Grid View
@@ -128,10 +170,10 @@ class _HomePageState extends State<HomePage> {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 children: [
-                  buildStatCard(".. W/m²", "Intensitas"),
-                  buildStatCard("45°", "Sudut Servo"),
-                  buildStatCard("30°C", "Suhu"),
-                  buildStatCard("70%Rh", "Kelembapan"),
+                  buildStatCard("${_firebaseData['intensitas'] ?? 0} W/m²", "Intensitas"),
+                  buildStatCard("${_firebaseData['sudut'] ?? 0}°", "Sudut Servo"),
+                  buildStatCard("${_firebaseData['suhu'] ?? 0}°C", "Suhu"),
+                  buildStatCard("${_firebaseData['kelembapan'] ?? 0}%Rh", "Kelembapan"),
                 ],
               ),
             ),
@@ -144,7 +186,7 @@ class _HomePageState extends State<HomePage> {
   Widget buildStatCard(String value, String label) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.lightBlueAccent,
+        color: Color(0xFF81C784), // Light green color for the card
         borderRadius: BorderRadius.circular(12),
       ),
       child: Center(
@@ -156,13 +198,13 @@ class _HomePageState extends State<HomePage> {
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(fontSize: 16, color: Colors.white),
+              style: const TextStyle(fontSize: 16, color: Colors.white70),
             ),
           ],
         ),
