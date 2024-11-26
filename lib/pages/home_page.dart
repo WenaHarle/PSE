@@ -187,10 +187,10 @@ class _HomePageState extends State<HomePage> {
           children: [
             // Tree Image
             Container(
-              height: 150,
+              height: 200,
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/starbucks.png'), // Replace with your asset
+                  image: AssetImage('assets/logo.png'), // Replace with your asset
                   fit: BoxFit.contain,
                 ),
               ),

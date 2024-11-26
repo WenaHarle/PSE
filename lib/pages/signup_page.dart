@@ -88,8 +88,8 @@ class _SignUpFormState extends State<SignUpForm> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/starbucks.png',
-                height: 150.0,
+                'assets/logo.png',
+                height: 200.0,
               ),
               const SizedBox(height: 20.0),
               Container(
