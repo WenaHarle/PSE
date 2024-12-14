@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:http/http.dart' as http; // For HTTP requests
-
+import 'settings_page.dart';
 import '../globals.dart'; // Import the global variable
 
 class HomePage extends StatefulWidget {
@@ -176,7 +176,10 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsPage()),
+            );},
           ),
         ],
       ),
@@ -292,7 +295,6 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   buildStatCard("${_firebaseData['intensitas'] ?? 0} W/m²", "Intensitas"),
                   buildStatCard("${_firebaseData['suhu'] ?? 0}°C", "Suhu"),
-                  buildStatCard("${_firebaseData['kelembapan'] ?? 0}%Rh", "Kelembapan"),
                 ],
               ),
             ),
